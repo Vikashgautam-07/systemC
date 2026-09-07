@@ -7,4 +7,3 @@ primitives) to understand what real hardware IP does under the hood.
 
 - [`custom_fifo/`](./custom_fifo) — synchronous FIFO with backpressure, built from
   sc_signal storage and explicit pointers rather than sc_fifo<T>.
-- `uart/` — UART TX/RX with configurable baud rate (in progress).
