@@ -1,6 +1,6 @@
 # UART in SystemC
 
-This folder contains a small SystemC UART exercise based on a transmitter/receiver skeleton. The goal is to model a serial UART channel using clock-driven state machines and to practice timing-sensitive digital design in SystemC.
+This folder contains a small SystemC UART loopback exercise. The transmitter and receiver model a serial UART channel using clock-driven finite state machines and a shared serial line.
 
 ## Project goal
 
@@ -63,7 +63,7 @@ During the stop bit:
 
 ## UART RX module
 
-The `UartRx` module is defined as a skeleton and follows the same clock-driven approach as the transmitter. It contains:
+The `UartRx` module follows the same clock-driven approach as the transmitter. It contains:
 
 - `clk`
 - `rst`
@@ -72,7 +72,7 @@ The `UartRx` module is defined as a skeleton and follows the same clock-driven a
 - `rx_data`
 - `rx_error`
 
-The RX design is expected to:
+The RX design:
 
 - wait for the falling edge of the line (start bit)
 - wait for the center of the bit period
@@ -81,7 +81,7 @@ The RX design is expected to:
 - validate the stop bit
 - pulse `rx_valid` when a full byte has been received
 
-This is a key UART design point: sampling at the edge of a bit can be wrong because the signal is still transitioning. Sampling in the middle of the bit period gives the most stable reading.
+The receiver validates the start bit at its midpoint, samples each data bit at its midpoint, and checks the stop bit at its midpoint. `rx_valid` is asserted for one clock cycle when a complete frame is valid. `rx_error` is asserted for one clock cycle when the stop bit is invalid.
 
 ## Timing model
 
@@ -91,7 +91,7 @@ SystemC does not have a native baud-rate concept, so UART timing is modeled as a
 
 For example, if the clock is 50 MHz and the UART rate is 115200 baud, then one bit period is roughly 434 clock cycles.
 
-In this exercise, `CYCLES_PER_BIT` is intentionally kept small for testing and learning, and is set to a simple placeholder value for ease of simulation.
+In this exercise, `CYCLES_PER_BIT` is set to `8` in `testbench.cc` so that complete frames run quickly in simulation. A frame contains 10 bit periods, so one byte takes 80 clock cycles, excluding the inter-frame gap.
 
 ## State-machine style
 
@@ -103,20 +103,54 @@ The design is intentionally written as synchronous logic using `SC_METHOD` and a
 
 This is a natural way to model digital communication protocols in SystemC.
 
-## Suggested verification strategy
+## Testbench and verification
 
-A simple loopback test is the standard way to validate the design:
+`testbench.cc` connects `tx_line` directly to `rx_line` and tests these bytes:
 
-1. Connect `UartTx::tx_line` directly to `UartRx::rx_line`
-2. Drive `tx_start` with a byte such as `0x00`, `0xFF`, `0x55`, or `0xAA`
-3. Advance the clock for enough cycles to complete a full frame
-4. Check that the RX data matches the transmitted byte
-5. Confirm that `rx_valid` pulses when the byte is complete
+```text
+0x00, 0xFF, 0x55, 0xAA, 0x3C
+```
 
-This gives confidence that the serial protocol is working as expected.
+For every byte, the testbench:
 
-## Summary
+1. waits until `tx_busy` is low
+2. pulses `tx_start` for one clock cycle
+3. waits for `rx_valid`
+4. compares `rx_data` with the transmitted value
 
+The expected result is:
+
+```text
+[TB] summary: 5/5 frames passed
+```
+
+The monitor also prints TX start events, RX valid events, and RX errors.
+
+## Build and run
+
+The Makefile uses the SystemC installation at `/usr/local/systemc` and compiles with C++17.
+
+```bash
+make
+./uart_test
+```
+
+To remove generated object files and the executable:
+
+```bash
+make clean
+```
+
+The source files are:
+
+- `uart.h` : module declarations
+- `uart.cc` : TX and RX FSM implementations
+- `testbench.cc` : loopback stimulus, monitor, and pass/fail checks
+- `Makefile` : build configuration
+
+## Essence of this Project
+
+It is a good foundation for understanding how UART works in hardware and how to model communication protocols with synchronous finite state machines.
 This UART example is meant to teach the following concepts:
 
 - FSM design in SystemC
@@ -124,5 +158,3 @@ This UART example is meant to teach the following concepts:
 - bit-level protocol modeling
 - clock-cycle-based baud-rate simulation
 - loopback-based verification
-
-It is a good foundation for understanding how UART works in hardware and how to model communication protocols with synchronous finite state machines.
