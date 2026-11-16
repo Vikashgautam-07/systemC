@@ -24,4 +24,11 @@ These SystemC examples model two-input logic gates. Each gate updates its
 | 1 | 1 | 1 |
 
 
+```bash
+g++ -std=c++17 and.cc -o and -lsystemc
+./and
+
+g++ -std=c++17 or.cc -o or -lsystemc
+./or
+```
 
