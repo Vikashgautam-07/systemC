@@ -19,10 +19,14 @@ SC_MODULE(mux)
         
         switch (sel) 
         {
-            case 0: out.write(i1.read()); break;
-            case 1: out.write(i2.read()); break;
-            case 2: out.write(i3.read()); break; 
-            case 3: out.write(i4.read()); break;
+            case 0: out.write(i1.read()); 
+                    break;
+            case 1: out.write(i2.read()); 
+                    break;
+            case 2: out.write(i3.read()); 
+                    break; 
+            case 3: out.write(i4.read()); 
+                    break;
         }
     }
 };
@@ -79,7 +83,8 @@ SC_MODULE(testbench)
 
             int accepted = out.read();
             bool ok = (accepted == tc.expected);
-            cout << "i1 = " << tc.i1 << " i2 = " << tc.i2 << " i3 = " << tc.i3 << " i4 = " << tc.i4 << " sel1 = " << tc.sel1 << " sel2 = " << tc.sel2
+            cout << "i1 = " << tc.i1 << " i2 = " << tc.i2 << " i3 = " << tc.i3 << " i4 = " << tc.i4
+                 << " sel1 = " << tc.sel1 << " sel2 = " << tc.sel2
                  << " expected = " << tc.expected << " actual = " << accepted
                  << " -> " << (ok ? "PASS" : "FAIL") << endl;
         }
