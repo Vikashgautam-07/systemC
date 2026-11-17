@@ -24,4 +24,8 @@ compile and run instructions.
 
 ## License
 
-This repository is licensed under the [MIT License](./LICENSE).
+Vikashgautam-07/systemC is licensed under the [MIT License](./LICENSE), a
+permissive license that allows commercial and private use, modification, and
+distribution. Copies or substantial portions must retain the copyright and
+license notice. The software is provided without warranty, and its authors
+are not liable for claims or damages.
