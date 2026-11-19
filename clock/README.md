@@ -41,3 +41,21 @@ changes how long the signal remains high versus low.
 In this example, the monitor reports whether the signal is high or low and the
 simulation time whenever the clock changes. The simulation runs for 100 ns,
 which covers ten complete clock periods.
+
+## 4. `clocked_thread_method.cc`: Clocked thread and method
+
+The `clocked_thread_method.cc` example compares two processes driven by a 100 ns clock with a
+50% duty cycle and a rising edge at time zero. `ClockedThreadModule` uses an
+`SC_THREAD` that waits for positive clock edges and prints the simulation
+time. `ClockedMethodModule` uses an `SC_METHOD` and `next_trigger` to run on
+positive edges, printing no more often than once every 1000 ns.
+
+The simulation runs for 10000 ns (10 us), so both processes report at 0, 1, 2,
+and subsequent whole microseconds through 9 us.
+
+Build and run from the `clock` directory:
+
+```sh
+g++ -std=c++17 clocked_thread_method.cc -o clk -lsystemc
+./clk
+```
